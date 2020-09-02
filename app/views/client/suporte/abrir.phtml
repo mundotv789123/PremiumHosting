@@ -1,0 +1,60 @@
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="font-weight-bold">
+                    Abrir novo ticket
+                </h4>
+                <br>
+                <form method="post" id="add" autocomplete="off">
+                    <div class="alert alert-danger" style="display: none"></div>
+                    <div class="form-group">
+                        <label for="subject">Assunto</label>
+                        <input class="form-control" name="subject" id="subject" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensagem</label>
+                        <textarea class="form-control" name="message" id="message" rows="5" autocomplete="off"></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-no-animation">Abrir ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    scripts.push(function() {
+       $('#add').on('submit', function(e) {
+           e.preventDefault();
+
+           var $btn = $('.btn-primary');
+           var $alert = $('.alert');
+
+           $alert.hide();
+           $btn.html('Abrindo...');
+           $btn.prop('disabled', true);
+
+           $.ajax({
+               url: '/client/suporte/actions',
+               method: 'POST',
+               data: $(this).serialize(),
+               dataType: 'JSON',
+               complete: function (result) {
+                   const {responseText: data} = result;
+
+                   var res = JSON.parse(data);
+
+                   if(res.success) {
+                       location.href = '/client/suporte';
+                   }else{
+                       $alert.fadeIn().html(res.message);
+                       $btn.html('Abrir ticket');
+                       $btn.prop('disabled', false);
+                   }
+               }
+           });
+
+           return false;
+       });
+    });
+</script>

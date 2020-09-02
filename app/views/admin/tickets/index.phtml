@@ -1,0 +1,47 @@
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="font-weight-bold">
+                    Tickets
+                </h4>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Assunto</th>
+                        <th scope="col">Última atualização</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+
+                    $ticket = new \app\libs\tickets\Ticket();
+                    $message = new \app\libs\tickets\Message();
+
+                    $tickets = $ticket->data();
+
+                    foreach ($tickets as $data):
+                        $last = $message->last($data->id);
+                        if($data->status != 3):
+                        ?>
+                        <tr style="cursor: pointer" onclick="location.href = '/admin/tickets/ler/<?= $data->id ?>-<?= \app\libs\utils\Slugify::encode($data->subject) ?>'">
+                            <th scope="row"><?= $data->id ?></th>
+                            <td><?= \app\libs\customers\Customer::getUsername($data->owner) ?></td>
+                            <td><?= mb_strimwidth($data->subject, 0, 25, '...') ?></td>
+                            <td><?= date("d/m/Y à\s H:i", strtotime($last->createdAt)) ?></td>
+                            <td><?= \app\libs\tickets\Ticket::STATUS[$data->status - 1] ?></td>
+                        </tr>
+                    <?php
+                        endif;
+                    endforeach;
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>

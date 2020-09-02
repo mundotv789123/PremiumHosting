@@ -1,0 +1,9 @@
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php
+# Redirecionar de sem www a com www
+RewriteCond %{HTTP_HOST} ^site.com.br
+RewriteRule ^ http://www.site.com.br%{REQUEST_URI} [L,R=301]
+RewriteRule ^detalhes\/([0-9]+)$ detalhes?id_curso=$1 [NC,L]
+DirectoryIndex home.php

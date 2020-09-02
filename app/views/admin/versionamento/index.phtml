@@ -1,0 +1,205 @@
+<main class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Versionamento</h5>
+                        <div class="alert alert-danger" style="display: none"></div>
+                        <form method="post" id="add" class="row" enctype="multipart/form-data">
+                            <div class="form-group col-md-3">
+                                <label for="type">Tipo</label>
+                                <select id="type" class="form-control">
+                                    <option selected disabled>Selecione</option>
+                                    <option value="1">Gratuito</option>
+                                    <option value="2">Pago</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="category">Categoria</label>
+                                <select id="category" class="form-control">
+                                    <option selected disabled>Aguarde...</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md">
+                                <label for="plugins">Plugin</label>
+                                <select name="plugin_id" id="plugins" class="form-control">
+                                    <option selected disabled>Aguarde...</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="version">Versão</label>
+                                <input name="version" id="version" class="form-control">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="jar">JAR</label>
+                                <br>
+                                <input name="jar" id="jar" type="file">
+                            </div>
+                            <div class="form-group col-md-12 pt-2">
+                                <textarea class="editor" name="changelog"></textarea>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <button class="btn btn-warning">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Versões</h5>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Versão</th>
+                                <th scope="col">Plugin</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $version = new \app\libs\plugins\Version();
+                            $versions = $version->data();
+
+                            if(count($versions) == 0):
+                                ?>
+                                <tr>
+                                    <th colspan="6">Não há versões</th>
+                                </tr>
+                            <?php
+                            endif;
+
+                            $plugin = new \app\libs\plugins\Plugin();
+
+                            foreach ($versions as $data):
+                                ?>
+                                <tr>
+                                    <th scope="row"><?= $data->version ?></th>
+                                    <td><?= $plugin->get($data->plugin_id)->name ?></td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete" id="<?= $data->id ?>">Remover</button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    scripts.push(function () {
+        $('#type').on('change', function () {
+            var value = $(this).val();
+            getCategories(value);
+
+            var options = "<option selected disabled>Aguarde...</option>";
+            $('#plugins').html(options);
+        });
+
+        $('#category').on('change', function () {
+            var value = $(this).val();
+            getPlugins(value);
+        });
+
+        function getCategories(type) {
+            $.ajax({
+                url: `/admin/plugins/actions/${type}`,
+                method: 'GET',
+                complete: function (result) {
+                    var data = result.responseJSON;
+
+                    var options = "<option selected disabled>Selecione:</option>";
+
+                    data.forEach(el => {
+                        options += "<option value='"+el.id+"'>"+el.name+"</option>";
+                    });
+
+                    $('#category').html(options);
+                }
+            })
+        }
+
+        function getPlugins(category) {
+            $.ajax({
+                url: `/admin/plugins/actions/plugins/${category}`,
+                method: 'GET',
+                complete: function (result) {
+                    var data = result.responseJSON;
+
+                    var options = "";
+
+                    data.forEach(el => {
+                        options += "<option value='"+el.id+"'>"+el.name+"</option>";
+                    });
+
+                    $('#plugins').html(options);
+                }
+            })
+        }
+
+        $('#add').on('submit', function (e) {
+            e.preventDefault();
+
+            var data = new FormData(this);
+
+            var alert = $('.alert');
+            var button = $('.btn-primary');
+
+            alert.hide();
+            button.html('Salvando...');
+            button.prop('disabled', true);
+
+            console.log($(this).serialize());
+
+            $.ajax({
+                url: '/admin/versionamento/actions',
+                method: 'POST',
+                data: data,
+                dataType: 'JSON',
+                cache: false,
+                contentType: false,
+                processData: false,
+                xhr: function() {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function() {
+                        }, false);
+                    }
+                    return myXhr;
+                },
+                complete: function (result) {
+                    console.log(result.responseText);
+                    var data = result.responseJSON;
+
+                    if(data.success) {
+                        location.reload();
+                    }else{
+                        alert.fadeIn().html(data.message);
+                    }
+
+                    button.html('Salvar');
+                    button.prop('disabled', false);
+                }
+            });
+
+            return false;
+        });
+
+        $('.delete').on('click', function () {
+            var id = $(this).attr('id');
+
+            $.ajax({
+                url: `/admin/versionamento/actions/${id}`,
+                type: 'DELETE',
+                success: function () {
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>

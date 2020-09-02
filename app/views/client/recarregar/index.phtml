@@ -1,0 +1,88 @@
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="h4 font-weight-bold mt-3">Recarregue sua conta</div>
+                <div class="divider mb-4"></div>
+                <form id="checkout">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="font-weight-bold text-muted" for="value">Valor da recarga</label>
+                            <div style="position: relative" class="mb-3">
+                                <div class="custom-span-left">R$</div>
+                                <div class="custom-span-right">,00</div>
+                                <input
+                                    name="value"
+                                    id="value"
+                                    class="custom-form-control custom-cost"
+                                    value="50"
+                                    onkeyup="this.value=this.value.replace(/[^\d]/,'')"
+                                    onchange="this.value=this.value.replace(/[^\d]/,'')"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <label class="font-weight-bold text-muted mt-3">Forma de pagamento</label>
+                    <div class="row mb-4">
+                        <!--<div class="col-md-2">
+                            <button class="btn btn-secondary btn-block" name="gateway" value="pagseguro">
+                                PagSeguro
+                            </button>
+                        </div>-->
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary btn-block" name="gateway" value="mercadopago">
+                                MercadoPago
+                            </button>
+                        </div>
+                        <!--<div class="col-md-2">
+                            <button class="btn btn-secondary btn-block" name="gateway" value="paypal">
+                                PayPal
+                            </button>
+                        </div>-->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    scripts.push(function () {
+       $('#checkout').on('submit', function (e) {
+           e.preventDefault();
+
+           var btns = $('.btn');
+           var btn = $('#checkout button[name=gateway]:focus');
+           var value = $('#checkout input[name=value]').val();
+
+           btns.prop('disabled', true);
+           btn.html('Aguarde...');
+
+           $.ajax({
+              url: '/client/recarregar/checkout',
+              method: 'POST',
+              data: {
+                  value,
+                  gateway: btn.val()
+              },
+              dataType: 'JSON',
+              complete: function (result) {
+                  const {responseText: data} = result;
+
+                  console.log(result.responseText);
+                  var res = JSON.parse(data);
+
+                  if(res.success) {
+                      location.href = res.link;
+                  }else{
+                      alert(res.message);
+
+                      btns.prop('disabled', false);
+                      btn.html('Tente novamente');
+                  }
+              }
+           });
+
+           return false;
+       });
+    });
+</script>

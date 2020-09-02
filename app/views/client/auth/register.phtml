@@ -1,0 +1,74 @@
+<div class="login-card" style="height: auto!important;">
+    <div class="px-5">
+        <img src="/app/templates/site/assets/images/logo-purple.png" height="36px" class="mt-4 mb-5" alt="Logo">
+        <h1>Cadastre-se</h1>
+        <div class="divider w-25"></div>
+        <p class="mt-2 text-muted mb-4">Informe seus dados</p>
+        <span class="text-danger" id="alert" style="display: none;"></span>
+        <form id="register" class="row" method="post" autocomplete="off">
+            <input type="hidden" name="<?= $this->secret['name'] ?>" value="<?= $this->secret['value'] ?>">
+            <div class="form-group mt-2 col-md-6">
+                <label class="font-weight-bold text-muted">Nome</label>
+                <input class="form-control form-control-lg" name="<?= $this->inputs['i-name'] ?>" autocomplete="off">
+            </div>
+            <div class="form-group mt-2 col-md-6">
+                <label class="font-weight-bold text-muted">Sobrenome</label>
+                <input class="form-control form-control-lg" name="<?= $this->inputs['i-surname'] ?>" autocomplete="off">
+            </div>
+            <div class="form-group mt-2 col-md-12">
+                <label class="font-weight-bold text-muted">Email</label>
+                <input type="email" class="form-control form-control-lg" name="<?= $this->inputs['i-email'] ?>" autocomplete="off">
+            </div>
+            <div class="form-group mt-2 col-md-6">
+                <label class="font-weight-bold text-muted">Sua senha</label>
+                <input type="password" class="form-control form-control-lg" name="<?= $this->inputs['i-password'] ?>" autocomplete="off">
+            </div>
+            <div class="form-group mt-2 col-md-6">
+                <label class="font-weight-bold text-muted">Repita sua senha</label>
+                <input type="password" class="form-control form-control-lg" name="<?= $this->inputs['i-confirm'] ?>" autocomplete="off">
+            </div>
+            <div class="form-group mt-2 col-md-12 pt-4">
+                <button class="btn btn-secondary btn-rounded btn-block">Cadastrar</button>
+                <div class="text-center">
+                    <a class="btn btn-link btn-block text-muted mt-4" href="/client/auth/login">Voltar para o login</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    scripts.push(function() {
+        $('#register').on('submit', function (e) {
+            e.preventDefault();
+
+            var alert = $('#alert');
+            var data = $(this).serialize();
+            var button = $('.btn-secondary');
+
+            alert.hide();
+            button.prop('disabled', true);
+            button.html('Aguarde...');
+
+            $.ajax({
+                url: '/client/auth/register',
+                method: 'POST',
+                data,
+                complete: function (result) {
+                    var data = result.responseText;
+                    var res = JSON.parse(data);
+
+                    if(res.success) {
+                        location.reload();
+                    }else{
+                        alert.fadeIn().html(data.message);
+                    }
+
+                    button.prop('disabled', false);
+                    button.html('Cadastrar');
+                }
+            });
+
+            return false;
+        });
+    });
+</script>

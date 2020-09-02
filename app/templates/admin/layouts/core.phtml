@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PremiumHost - <?= $this->title ?></title>
+	<link rel="icon" type="image/x-icon" href="https://i.imgur.com/AXaOGc7.png">
+    <link rel="stylesheet" href="/app/templates/site/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/app/templates/site/bower_components/owl.carousel/dist/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="/app/templates/site/assets/css/styles.css">
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://kit.fontawesome.com/4cfd508d4f.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.css" rel="stylesheet">
+    <script>window.scripts = [];</script>
+</head>
+<body class="dashboard">
+<header>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 pt-2">
+                    <img src="/app/templates/site/assets/images/logo.png" alt="logo" height="40px">
+                </div>
+                <div class="col-md-8">
+                    <div class="float-right">
+                        <p class="text-white">
+                            <a href="/client" class="profile">
+                                <img src="https://avatars.dicebear.com/v2/initials/<?= \app\libs\customers\Profile::username() ?>.svg" alt="profile picture" height="40px" width="40px">
+                                <span>
+                                    Olá, <?= \app\libs\customers\Profile::username() ?>. <br>
+                                    <small>Visualizar como usuário!</small>
+                                </span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg dashboard-menu">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#conteudoNavbarSuportado" aria-controls="conteudoNavbarSuportado" aria-expanded="false" aria-label="Alterna navegação">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="conteudoNavbarSuportado">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item <?= $this->getController() == 'home' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/admin">Dashboard</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'servicos' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/admin/servicos">Planos</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'pendentes' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/admin/pendentes">Ativações pendentes</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'tickets' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/admin/tickets">Tickets</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'transacoes' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/admin/transacoes">Transações</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/client/auth/logout">
+                            Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<?= $this->render(); ?>
+<script src="/app/templates/site/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/app/templates/site/bower_components/popper.js/dist/umd/popper.min.js"></script>
+<script src="/app/templates/site/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/app/templates/site/bower_components/owl.carousel/dist/owl.carousel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.js"></script>
+<script src="/app/templates/site/assets/js/app.js"></script>
+<script>
+    $(function() {
+        if(scripts instanceof Array) {
+            $.each(scripts, function (index, fn) {
+                if(typeof fn === 'function') fn();
+            });
+        }
+    });
+</script>
+</body>
+</html>

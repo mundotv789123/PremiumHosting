@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Falha no sistema</title>
+</head>
+<body>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: #f4f4f4;
+            font-family: 'Ubuntu', sans-serif;
+        }
+        .error_panel {
+            width: 450px;
+            background: #fff;
+            border-radius: 10px;
+            border: solid 1px rgba(0,0,0,.01);
+            color: rgba(0,0,0,.4);
+            margin: 0 auto;
+            margin-top: 22vh;
+            padding: 25px 15px;
+        }
+        h1 {
+            margin: 0;
+        }
+        textarea {
+            background: rgba(0,0,0,.03);
+            width: 93%;
+            border: none;
+            padding: 15px;
+            word-break: break-word;
+            resize: none;
+        }
+    </style>
+    <div class="error_panel">
+        <h1><font color="#ff6347">!</font> System has broken</h1>
+        <br>
+        <textarea><?= APP_ERROR ?></textarea>
+    </div>
+</body>
+</html>

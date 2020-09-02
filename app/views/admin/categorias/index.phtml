@@ -1,0 +1,125 @@
+<main class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Criar nova categoria</h5>
+                        <div class="alert alert-danger" style="display: none"></div>
+                        <form method="post" id="add" class="row">
+                            <div class="form-group col-md-4">
+                                <label for="name">Nome</label>
+                                <input name="name" id="name" class="form-control">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="icon">Ícone (<a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Escolher</a>)</label>
+                                <input name="icon" id="icon" class="form-control">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="type">Tipo</label>
+                                <select name="type" id="type" class="form-control">
+                                    <option value="1">Gratuito</option>
+                                    <option value="2">Pago</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <button class="btn btn-warning">Salvar & Criar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Categorias ativas</h5>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Ícone</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $category = new \app\libs\plugins\Category();
+                            $categories = $category->data();
+
+                            if(count($categories) == 0):
+                                ?>
+                                <tr>
+                                    <th colspan="6">Não há categorias</th>
+                                </tr>
+                            <?php
+                            endif;
+
+                            foreach ($categories as $data):
+                                ?>
+                                <tr>
+                                    <th scope="row"><?= $data->id ?></th>
+                                    <td><?= $data->icon ?></td>
+                                    <td><?= $data->name ?></td>
+                                    <td><?= $data->type == 1 ? 'Gratuito' : 'Pago' ?></td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete" id="<?= $data->id ?>">Deletar</button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    scripts.push(function () {
+        $('#add').on('submit', function (e) {
+            e.preventDefault();
+
+            var alert = $('.alert');
+            var button = $('.btn-primary');
+
+            alert.hide();
+            button.html('Salvando...');
+            button.prop('disabled', true);
+
+            $.ajax({
+                url: '/admin/categorias/actions',
+                method: 'POST',
+                data: $(this).serialize(),
+                complete: function (result) {
+                    console.log(result.responseText);
+                    var data = result.responseJSON;
+
+                    if(data.success) {
+                        location.reload();
+                    }else{
+                        alert.fadeIn().html(data.message);
+                    }
+
+                    button.html('Salvar & Criar');
+                    button.prop('disabled', false);
+                }
+            });
+
+            return false;
+        });
+
+        $('.delete').on('click', function () {
+            var id = $(this).attr('id');
+
+            $.ajax({
+                url: `/admin/categorias/actions/${id}`,
+                type: 'delete',
+                success: function () {
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>

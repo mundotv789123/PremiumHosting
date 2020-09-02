@@ -1,0 +1,114 @@
+<?php
+
+$plan = new \app\libs\services\Plan();
+?>
+<main class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="status-card mb-4">
+                    <i class="fas fa-server"></i>
+                    <div>
+                        <div class="title">Serviços ativos</div>
+                        <div class="amount"><?= count(\app\libs\customers\Profile::services()) ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="status-card mb-4">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <div>
+                        <div class="title">Faturas abertas</div>
+                        <div class="amount"><?= count(\app\libs\customers\Profile::services('SUSPENDED')) ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="status-card mb-4">
+                    <i class="far fa-life-ring"></i>
+                    <div>
+                        <div class="title">Tickets abertos</div>
+                        <div class="amount"><?= count(\app\libs\customers\Profile::tickets()) ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Serviços</h5>
+                        <table class="table">
+                            <thead>
+                            <tr style="font-size: 14px;">
+                                <th scope="col">Plano</th>
+                                <th scope="col">Expira em</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $services = \app\libs\customers\Profile::services();
+
+                            if(count($services) == 0):
+                                ?>
+                                <tr>
+                                    <th colspan="6" class="font-weight-light">Não há serviços</th>
+                                </tr>
+                            <?php
+                            endif;
+
+                            foreach ($services as $data):
+                                ?>
+                                <tr style="cursor:pointer;font-size: 14px;" onclick="location.href = '/client/servicos/detalhes/<?= $data->id ?>'">
+                                    <td><?= $plan->data($data->plan_id)->name ?> (<?= \app\libs\services\PlanEnum::translate($plan->data($data->plan_id)->type) ?>)</td>
+                                    <td><?= date("d/m/Y", strtotime($data->expire_at)) ?></td>
+                                    <td><?= \app\libs\services\ServiceEnum::translate($data->status) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Tickets</h5>
+                        <table class="table">
+                            <thead>
+                            <tr style="font-size: 14px;">
+                                <th scope="col">Assunto</th>
+                                <th scope="col">Atualização</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+
+                            $ticket = new \app\libs\tickets\Ticket();
+                            $message = new \app\libs\tickets\Message();
+
+                            $tickets = $ticket->data(\app\libs\customers\Authentication::id());
+
+                            if(count($tickets) == 0) {
+                                echo "<th colspan='5' class='font-weight-light'>Você ainda não abriu nenhum ticket</th>";
+                            }
+
+                            foreach ($tickets as $data):
+                                $last = $message->last($data->id);
+                                ?>
+                                <tr style="cursor: pointer; font-size:12px" onclick="location.href = '/client/suporte/ler/<?= $data->id ?>-<?= \app\libs\utils\Slugify::encode($data->subject) ?>'">
+                                    <td><?= mb_strimwidth($data->subject, 0, 25, '...') ?></td>
+                                    <td><?= \app\libs\utils\Timeago::convert(date("Y-m-d H:i:s", strtotime($last->createdAt))) ?></td>
+                                    <td><?= \app\libs\tickets\Ticket::STATUS[$data->status - 1] ?></td>
+                                </tr>
+                            <?php
+                            endforeach;
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

@@ -1,0 +1,53 @@
+<?php
+
+$service = new \app\libs\services\Service();
+$data = $service->data($this->getParams(0));
+?>
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="h4 font-weight-bold mb-3">Serviço #<?= 10000 + $this->getParams(0) ?></div>
+                <p>
+                    <b>Status do serviço:</b> <?= \app\libs\services\ServiceEnum::translate($data->status) ?> <br>
+                    <b>Expira em </b> <?= date('d/m/Y', strtotime($data->expire_at)) ?>
+                </p>
+                <hr>
+                <?php if($data->data && $data->status == 'ACTIVE'): ?>
+                    <div class="h5 mb-3">Dados do seu serviço</div>
+                    <?php foreach (json_decode($data->data) as $item): ?>
+                        <p class="mb-1"><b><?= $item->name ?>:</b> <?= $item->value ?></p>
+                    <?php endforeach; ?>
+                    <br>
+                    <button class="btn btn-warning" onclick="renew()">Renovar</button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    function renew() {
+        $.ajax({
+            url: '/client/servicos/detalhes/renew',
+            method: 'POST',
+            data: { id: <?= $data->id ?> },
+            complete: function (data) {
+                const res = JSON.parse(data.responseText);
+
+                if(res.success) {
+                    Swal.fire(
+                        'Renovado!',
+                        res.message,
+                        'success'
+                    ).then(() => location.reload());
+                }else{
+                    Swal.fire(
+                        'Ocorreu um erro',
+                        res.message,
+                        'error'
+                    ).then(() => location.href = '/client/recarregar');
+                }
+            }
+        })
+    }
+</script>

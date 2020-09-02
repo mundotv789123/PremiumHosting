@@ -1,0 +1,197 @@
+<?php
+
+$transaction = new \app\libs\financial\Transaction();
+?>
+<main class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="status-card mb-4">
+                    <i class="fa fa-users"></i>
+                    <div>
+                        <div class="title">Usuários registrados</div>
+                        <div class="amount">
+                            <?php
+
+                            $customers = new \app\libs\customers\Customer();
+                            echo count($customers->data());
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="status-card mb-4">
+                    <i class="fas fa-server"></i>
+                    <div>
+                        <div class="title">Ativações pendentes</div>
+                        <div class="amount">
+                            <?php
+
+                            $service = new \app\libs\services\Service();
+                            echo count($service->pendings());
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="status-card mb-4">
+                    <i class="far fa-life-ring"></i>
+                    <div>
+                        <div class="title">Tickets abertos</div>
+                        <div class="amount">
+                            <?php
+
+                            $ticket = new \app\libs\tickets\Ticket();
+                            $tickets = $ticket->data();
+
+                            $i = 0;
+                            foreach ($tickets as $data) {
+                                if($data->status == 1) {
+                                    $i++;
+                                }
+                            }
+
+                            echo $i;
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="status-card mb-4">
+                    <i class="fas fa-dollar-sign"></i>
+                    <div>
+                        <div class="title">Renda mensal</div>
+                        <div class="amount">R$ <?= number_format($transaction->monthEarn(), 2, ',', '.') ?></div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="status-card mb-4">
+                    <i class="far fa-chart-bar"></i>
+                    <div>
+                        <div class="title">Vendas mensais</div>
+                        <div class="amount">
+                            <?= $transaction->monthSales() ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Gráfico de renda</h5>
+                        <div id="chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Últimas recargas</h5>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Transação</th>
+                                <th scope="col">Referência</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Valor da Recarga</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $transactions = $transaction->data([
+                                'limit' => 15
+                            ]);
+
+                            if(count($transactions) == 0):
+                            ?>
+                            <tr>
+                                <th colspan="6">Não há transações</th>
+                            </tr>
+                            <?php
+                            endif;
+
+                            foreach ($transactions as $data):
+                            ?>
+                            <tr>
+                                <th scope="row"><?= $data->code ?></th>
+                                <td><?= $data->reference ?></td>
+                                <td><?= $data->username ?></td>
+                                <td>R$ <?= number_format($data->gross_amount, 2, ',', '.') ?></td>
+                                <td><?= date("d/m/Y à\s H:i", strtotime($data->date)) ?></td>
+                                <td><?= $data->paid ? 'Creditado' : 'Pendente' ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    scripts.push(function() {
+        var options = {
+            chart: {
+                height: 350,
+                type: 'area',
+                zoom: {
+                    enabled: false
+                }
+            },
+            colors: ['#5352ed'],
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            labels: [
+                <?php
+
+                $date = explode('-', date('Y-m'));
+                $daysAmount = cal_days_in_month(CAL_GREGORIAN, intval($date[1]), intval($date[0]));
+
+                $startDate = "{$date[0]}-{$date[1]}-01";
+                $dates = [];
+                for($i = 0; $i < $daysAmount; $i++) {
+                    $day = date("d/m/Y", strtotime($startDate."+{$i} days"));
+                    $dates[] = $day;
+                    echo "'{$day}',";
+                }
+                ?>
+            ],
+            series: [{
+                name: "Valor",
+                data: [
+                    <?php
+
+                        foreach ($dates as $date) {
+                            echo number_format($transaction->getEarnInDate($date), 2, '.', '') . ', ';
+                        }
+                    ?>
+                ]
+            }],
+            xaxis: {
+
+            },
+            yaxis: {
+
+            },
+        };
+
+        var chart = new ApexCharts(
+            document.querySelector("#chart"),
+            options
+        );
+
+        chart.render();
+    })
+</script>

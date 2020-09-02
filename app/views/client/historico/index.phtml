@@ -1,0 +1,44 @@
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="font-weight-bold">Histórico financeiro</h4>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Forma de Pagamento</th>
+                        <th scope="col">Transação</th>
+                        <th scope="col">Valor da Recarga</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $transactions = \app\libs\customers\Profile::transactions();
+
+                    if(count($transactions) == 0):
+                        ?>
+                        <tr>
+                            <th colspan="6" class="font-weight-light">Não há histórico de recarga</th>
+                        </tr>
+                    <?php
+                    endif;
+
+                    foreach ($transactions as $data):
+                        ?>
+                        <tr>
+                            <th scope="row"><?= $data->gateway ?></th>
+                            <td><?= $data->reference ?></td>
+                            <td>R$ <?= number_format($data->gross_amount, 2, ',', '.') ?></td>
+                            <td><?= date("d/m/Y à\s H:i", strtotime($data->date)) ?></td>
+                            <td><?= $data->paid ? 'Creditado' : 'Pendente' ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>

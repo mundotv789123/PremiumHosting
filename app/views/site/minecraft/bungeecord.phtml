@@ -1,0 +1,70 @@
+<?php
+
+$plan = new \app\libs\services\Plan();
+$data = $plan->data(null, 'MINECRAFT_BUNGEECORD');
+?>
+<section id="products">
+    <div class="container">
+        <div class="owl-carousel py-1 px-1">
+            <?php
+
+            foreach ($data as $item):
+                ?>
+                <div class="plan">
+                    <div class="plan-title">
+                        <?= $item->name ?>
+                    </div>
+                    <h3 class="plan-price my-4">
+                        <span class="pricing-currency">R$</span>
+                        <span class="pricing-cost"><?= explode('.', $item->price)[0]; ?></span>
+                        <span class="pricing-period">/mês</span>
+                    </h3>
+                    <div class="plan-country my-2 text-center">
+                        Hospedado no <b>Canadá</b>
+                    </div>
+                    <ul class="plan-description">
+                        <?php foreach (json_decode($item->data) as $feature): ?>
+                            <li>
+                                <i class="fas fa-check"></i> <?= $feature ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <button onclick="hireService(<?= $item->id ?>, this)">Contratar agora</button>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<script>
+    function hireService(planId, button) {
+        $(button).html('Aguarde...');
+
+        $.ajax({
+            url: '/client/servicos/hire',
+            method: 'POST',
+            data: { planId },
+            complete: function (data) {
+                const {responseText: result} = data;
+                console.log(result);
+
+                var res = JSON.parse(result);
+
+                if(res.success) {
+                    Swal.fire(
+                        'Contratado!',
+                        res.message,
+                        'success'
+                    ).then(() => location.href = '/client/servicos');
+                }else{
+                    Swal.fire(
+                        'Ops...',
+                        res.message,
+                        'error'
+                    );
+                }
+
+                $(button).html('Contratar agora');
+            }
+        });
+    }
+</script>

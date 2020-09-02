@@ -1,0 +1,46 @@
+<?php
+
+$plan = new \app\libs\services\Plan();
+?>
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="h4 font-weight-bold mb-3">Meus serviços</div>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID do Serviço</th>
+                        <th scope="col">Plano</th>
+                        <th scope="col">Expira em</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $services = \app\libs\customers\Profile::services();
+
+                    if(count($services) == 0):
+                        ?>
+                        <tr>
+                            <th colspan="6" class="font-weight-light">Não há serviços</th>
+                        </tr>
+                    <?php
+                    endif;
+
+                    foreach ($services as $data):
+                        ?>
+                        <tr style="cursor:pointer;" onclick="location.href = '/client/servicos/detalhes/<?= $data->id ?>'">
+                            <th scope="row"><?= 10000 + $data->id ?></th>
+                            <td><?= $plan->data($data->plan_id)->name ?> (<?= \app\libs\services\PlanEnum::translate($plan->data($data->plan_id)->type) ?>)</td>
+                            <td><?= date("d/m/Y", strtotime($data->expire_at)) ?></td>
+                            <td><?= \app\libs\services\ServiceEnum::translate($data->status) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>

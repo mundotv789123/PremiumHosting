@@ -1,0 +1,50 @@
+<main class="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="font-weight-bold">
+                    Tickets
+                    <button class="btn btn-primary float-right px-3 py-1" onclick="location.href = '/client/suporte/abrir'">Abrir ticket</button>
+                </h4>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Assunto</th>
+                        <th scope="col">Última mensagem</th>
+                        <th scope="col">Última atualização</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+
+                    $ticket = new \app\libs\tickets\Ticket();
+                    $message = new \app\libs\tickets\Message();
+
+                    $tickets = $ticket->data(\app\libs\customers\Authentication::id());
+
+                    if(count($tickets) == 0) {
+                        echo "<th colspan='5' class='font-weight-light'>Você ainda não abriu nenhum ticket</th>";
+                    }
+
+                    foreach ($tickets as $data):
+                        $last = $message->last($data->id);
+                        ?>
+                        <tr style="cursor: pointer" onclick="location.href = '/client/suporte/ler/<?= $data->id ?>-<?= \app\libs\utils\Slugify::encode($data->subject) ?>'">
+                            <th scope="row"><?= $data->id ?></th>
+                            <td><?= mb_strimwidth($data->subject, 0, 25, '...') ?></td>
+                            <td><?= mb_strimwidth(\app\libs\utils\StripTags::exec($last->message), 0, 30, "...") ?></td>
+                            <td><?= date("d/m/Y à\s H:i", strtotime($last->createdAt)) ?></td>
+                            <td><?= \app\libs\tickets\Ticket::STATUS[$data->status - 1] ?></td>
+                        </tr>
+                    <?php
+                    endforeach;
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>

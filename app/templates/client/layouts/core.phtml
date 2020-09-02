@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PremiumHosting - <?= $this->title ?></title>
+	<link rel="icon" type="image/x-icon" href="https://i.imgur.com/AXaOGc7.png">
+    <link rel="stylesheet" href="/app/templates/site/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/app/templates/site/bower_components/owl.carousel/dist/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="/app/templates/site/assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.min.css" integrity="sha256-2bAj1LMT7CXUYUwuEnqqooPb1W0Sw0uKMsqNH0HwMa4=" crossorigin="anonymous" />
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://kit.fontawesome.com/4cfd508d4f.js" crossorigin="anonymous"></script>
+    <script>window.scripts = [];</script>
+</head>
+<body class="dashboard">
+<header>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 pt-2">
+                    <img src="/app/templates/site/assets/images/logo.png" alt="logo" height="40px">
+                </div>
+                <div class="col-md-8">
+                    <div class="float-right">
+                        <p class="text-white profile">
+                            <img src="https://avatars.dicebear.com/v2/initials/<?= \app\libs\customers\Profile::username() ?>.svg" alt="profile picture" height="40px" width="40px">
+                            <span>
+                                Olá, <?= \app\libs\customers\Profile::username() ?>. <br>
+                                <small>Bem-vindo de volta!</small>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg dashboard-menu">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#conteudoNavbarSuportado" aria-controls="conteudoNavbarSuportado" aria-expanded="false" aria-label="Alterna navegação">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="conteudoNavbarSuportado">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item <?= $this->getController() == 'home' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/client">Dashboard</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'servicos' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/client/servicos">Serviços ativos</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'historico' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/client/historico">Histórico financeiro</a>
+                    </li>
+                    <li class="nav-item <?= $this->getController() == 'tickets' ? 'active' : '' ?>">
+                        <a class="nav-link" href="/client/suporte">Suporte</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item wallet" data-toggle="tooltip" data-placement="left" title="Clique para recarregar">
+                        <a class="nav-link" href="/client/recarregar">
+                            <i class="fas fa-wallet mr-2"></i>
+                            R$<?= number_format(\app\libs\customers\Profile::wallet(), 2, ',', '.') ?>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/client/auth/logout">
+                            Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<?= $this->render(); ?>
+<script src="/app/templates/site/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/app/templates/site/bower_components/popper.js/dist/umd/popper.min.js"></script>
+<script src="/app/templates/site/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/app/templates/site/bower_components/owl.carousel/dist/owl.carousel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.min.js" integrity="sha256-2RS1U6UNZdLS0Bc9z2vsvV4yLIbJNKxyA4mrx5uossk=" crossorigin="anonymous"></script>
+<script src="/app/templates/site/assets/js/app.js"></script>
+<script>
+    $(function() {
+        if(scripts instanceof Array) {
+            $.each(scripts, function (index, fn) {
+                if(typeof fn === 'function') fn();
+            });
+        }
+    });
+</script>
+</body>
+</html>

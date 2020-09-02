@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PremiumHosting - <?= $this->title ?></title>
+	<link rel="icon" type="image/x-icon" href="https://i.imgur.com/AXaOGc7.png">
+    <link rel="stylesheet" href="/app/templates/site/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/app/templates/site/bower_components/owl.carousel/dist/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="/app/templates/site/assets/css/styles.css">
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://kit.fontawesome.com/4cfd508d4f.js" crossorigin="anonymous"></script>
+    <script>window.scripts = [];</script>
+</head>
+<body class="auth-page">
+
+<?= $this->render(); ?>
+
+<script src="/app/templates/site/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/app/templates/site/bower_components/popper.js/dist/umd/popper.min.js"></script>
+<script src="/app/templates/site/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/app/templates/site/bower_components/owl.carousel/dist/owl.carousel.min.js"></script>
+<script src="/app/templates/site/bower_components/email-autocomplete/jquery.email-autocomplete.min.js"></script>
+<script src="/app/templates/site/assets/js/app.js"></script>
+<script>
+    $(function() {
+        if(scripts instanceof Array) {
+            $.each(scripts, function (index, fn) {
+                if(typeof fn === 'function') fn();
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<main class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Cadastrar novo plano</h5>
+                        <div class="alert alert-danger" style="display: none"></div>
+                        <form method="post" id="add" class="row">
+                            <div class="form-group col-md-5">
+                                <label for="name">Nome</label>
+                                <input name="name" id="name" class="form-control">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="price">Preço</label>
+                                <input name="price" id="price" type="number" class="form-control">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="type">Categoria</label>
+                                <select name="type" id="type" class="form-control" style="padding: 0 10px!important">
+                                    <option value="MINECRAFT_SINGLE">Hospedagem Minecraft</option>
+                                    <option value="MINECRAFT_BUNGEECORD">Minecraft BungeeCord</option>
+                                    <option value="CLOUD_COMPUTING">Cloud Computing</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12 pt-2">
+                                <label>Características</label>
+                                <button type="button" class="float-right btn btn-light btn-no-animation btn-sm" onclick="addFeature()">Adicionar</button>
+                                <br><br>
+                                <div id="features">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <input class="form-control feature-data" name="data[]" id="feature-1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <button class="btn btn-warning">Salvar & Criar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Planos</h5>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Preço</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+
+                                $plan = new \app\libs\services\Plan();
+                                foreach ($plan->data() as $data):
+                                ?>
+                                <tr>
+                                    <th scope="row"><?= $data->id ?></th>
+                                    <td><?= $data->name ?></td>
+                                    <td><?= $data->type ?></td>
+                                    <td>R$<?= number_format($data->price, 2, ',', '.') ?></td>
+                                    <td>
+                                        <a href="/admin/servicos/edit/<?= $data->id ?>" class="btn btn-primary btn-sm">Editar</a>
+                                        <button class="btn btn-danger btn-sm delete" id="<?= $data->id ?>">Deletar</button>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    function addFeature()
+    {
+        var featureDiv = $('#features');
+        var featureData = $('.feature-data');
+
+        var id = featureData.length + 1;
+
+        featureDiv.append('<div class="row pt-4" id="ft-'+id+'">\n' +
+            '                                        <div class="col-md-8">\n' +
+            '                                            <input class="form-control feature-data" name="data[]" id="feature-' + id + '">\n' +
+            '                                        </div>\n' +
+            '                                        <div class="col-md-4 pt-2">\n' +
+            '                                            <a class="text-danger" onclick="removeFeature('+id+')">Remover</a>\n' +
+            '                                        </div>\n' +
+            '                                    </div>');
+    }
+
+    function removeFeature(id) {
+        $(`#ft-${id}`).remove();
+    }
+
+    scripts.push(function () {
+        $('#add').on('submit', function (e) {
+            e.preventDefault();
+
+            var alert = $('.alert');
+            var button = $('.btn-primary');
+
+            alert.hide();
+            button.html('Salvando...');
+            button.prop('disabled', true);
+
+            console.log($(this).serialize());
+
+            $.ajax({
+                url: '/admin/servicos/actions',
+                method: 'POST',
+                data: $(this).serialize(),
+                complete: function (result) {
+                    var data = result.responseJSON;
+
+                    if(data.success) {
+                        location.reload();
+                    }else{
+                        alert.fadeIn().html(data.message);
+                    }
+
+                    button.html('Salvar & Criar');
+                    button.prop('disabled', false);
+                }
+            });
+
+            return false;
+        });
+
+        $('.delete').on('click', function () {
+            var id = $(this).attr('id');
+
+            $.ajax({
+                url: `/admin/servicos/actions/${id}`,
+                type: 'DELETE',
+                success: function () {
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>

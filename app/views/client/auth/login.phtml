@@ -1,0 +1,66 @@
+<div class="login-card px-5">
+    <div class="px-5">
+        <img src="/app/templates/site/assets/images/logo-purple.png" height="36px" class="mt-4 mb-5" alt="Logo">
+        <h1 class="font-weight-bold">Bem-vindo de volta!</h1>
+        <div class="divider w-25"></div>
+        <p class="mt-2 text-muted mb-5">Entre na conta com seu e-mail e senha</p>
+        <span class="text-danger" id="alert" style="display: none;"></span>
+        <form id="login" method="post" autocomplete="off">
+            <input type="hidden" name="<?= $this->secret['name'] ?>" value="<?= $this->secret['value'] ?>">
+            <div class="form-group mt-2">
+                <label class="font-weight-bold text-muted">Email</label>
+                <input type="email" class="form-control form-control-lg" name="<?= $this->inputs['i-email'] ?>" autocomplete="off">
+            </div>
+            <div class="form-group mt-2">
+                <label class="font-weight-bold text-muted">Senha</label>
+                <input type="password" class="form-control form-control-lg" name="<?= $this->inputs['i-password'] ?>" autocomplete="off">
+            </div>
+            <!--
+            <div class="text-right mb-4">
+                <a href="#" class="text-muted">Esqueci minha senha</a>
+            </div>
+            -->
+            <button class="btn btn-secondary btn-block btn-rounded mt-3">Entrar</button>
+        </form>
+    </div>
+    <a class="btn btn-link btn-block text-muted" href="/client/auth/register">Ainda não tem uma conta? Registre-se</a>
+</div>
+<script>
+    scripts.push(function() {
+        $('#login').on('submit', function (e) {
+           e.preventDefault();
+
+           var alert = $('#alert');
+           var data = $(this).serialize();
+           var button = $('.btn-dark');
+
+           alert.hide();
+           button.prop('disabled', true);
+           button.html('Aguarde...');
+
+           $.ajax({
+               url: '/client/auth/login',
+               method: 'POST',
+               data,
+               complete: function (result) {
+                   var data = result.responseJSON;
+
+                   if(data.success) {
+                       if(data.isAdmin) {
+                           location.href = '/admin';
+                       }else{
+                           location.href = '/client';
+                       }
+                   }else{
+                       alert.fadeIn().html(data.message);
+                   }
+
+                   button.prop('disabled', false);
+                   button.html('Entrar');
+               }
+           });
+
+           return false;
+        });
+    });
+</script>

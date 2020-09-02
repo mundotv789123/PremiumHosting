@@ -1,0 +1,124 @@
+<?php
+
+$service = new \app\libs\services\Service();
+$plan = new \app\libs\services\Plan();
+
+$serviceData = $service->pendings($this->getParams(0));
+$data = $plan->data($serviceData->plan_id);
+?>
+<main class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-4 font-weight-bold">Ativar serviço</h5>
+                        <div class="alert alert-danger" style="display: none"></div>
+                        <form id="update" class="row">
+                            <input name="id" value="<?= $serviceData->id ?>" type="hidden">
+                            <div class="form-group col-md-12 pt-2">
+                                <p>
+                                    <b>Cliente:</b> <?= \app\libs\customers\Profile::username($serviceData->customer_id) ?> <br>
+                                    <b>Plano:</b> <?= $data->name ?> (<?= $data->type ?>) <br>
+                                    <b>Data:</b> <?= date("d/m/Y", strtotime($serviceData->created_at)) ?>
+                                </p>
+                                <br>
+                                <label>Dados do plano</label>
+                                <button type="button" class="float-right btn btn-light btn-no-animation btn-sm" onclick="addFeature()">Adicionar</button>
+                                <br><br>
+                                <div id="features">
+                                    <?php if(is_null($serviceData->data)): ?>
+                                        <div class="row pt-2">
+                                            <div class="col-md-5">
+                                                <input class="form-control feature-data" name="names[]">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input class="form-control feature-data" name="values[]">
+                                            </div>
+                                        </div>
+                                    <?php else: $i = 0; ?>
+                                        <?php foreach (json_decode($serviceData->data) as $item): $i++ ?>
+                                            <div class="row pt-2" id="ft-<?= $i ?>">
+                                                <div class="col-md-5">
+                                                    <input class="form-control feature-data" value="<?= $item->name ?>" name="names[]">
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <input class="form-control feature-data" value="<?= $item->value ?>" name="values[]">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <a class="text-danger" onclick="removeFeature(<?= $i ?>)">Remover</a>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif ?>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <button class="btn btn-warning">Enviar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    function addFeature()
+    {
+        var featureDiv = $('#features');
+        var featureData = $('.feature-data');
+
+        var id = featureData.length + 1;
+
+        featureDiv.append('<div class="row pt-2" id="ft-'+id+'">\n' +
+'                                        <div class="col-md-5">\n' +
+'                                            <input class="form-control feature-data" name="names[]">\n' +
+'                                        </div>\n' +
+'                                        <div class="col-md-5">\n' +
+'                                            <input class="form-control feature-data" name="values[]">\n' +
+'                                        </div>\n' +
+'                                        <div class="col-md-2">\n' +
+'                                            <a class="text-danger" onclick="removeFeature('+id+')">Remover</a>\n' +
+'                                        </div>\n' +
+'                                    </div>');
+    }
+
+    function removeFeature(id) {
+        $(`#ft-${id}`).remove();
+    }
+
+    scripts.push(function () {
+        $('#update').on('submit', function (e) {
+            e.preventDefault();
+
+            var alert = $('.alert');
+            var button = $('.btn-warning');
+
+            alert.hide();
+            button.html('Enviando...');
+            button.prop('disabled', true);
+
+            $.ajax({
+                url: '/admin/pendentes/actions',
+                method: 'POST',
+                data: $(this).serialize(),
+                complete: function (result) {
+                    console.log(result.responseText);
+                    var data = result.responseJSON;
+
+                    if(data.success) {
+                        location.href = '/admin/pendentes';
+                    }else{
+                        alert.fadeIn().html(data.message);
+                    }
+
+                    button.html('Enviar');
+                    button.prop('disabled', false);
+                }
+            });
+
+            return false;
+        });
+    });
+</script>
